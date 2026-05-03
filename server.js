@@ -4,6 +4,9 @@ import dotenv from 'dotenv';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import { GoogleGenerativeAI } from '@google/generative-ai';
+import helmet from 'helmet';
+import rateLimit from 'express-rate-limit';
+
 
 dotenv.config();
 
@@ -13,8 +16,20 @@ const __dirname = path.dirname(__filename);
 const app = express();
 const PORT = process.env.PORT || 3000;
 
+// Security Middleware
+app.use(helmet({
+  contentSecurityPolicy: false, // Disable for easier demo, but enable in strict production
+}));
+
+const limiter = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15 minutes
+  max: 100, // Limit each IP to 100 requests per window
+  message: { error: 'Too many requests from this IP, please try again after 15 minutes' }
+});
+
 app.use(cors());
 app.use(express.json());
+app.use('/api/', limiter); // Apply rate limiting to all API routes
 
 // Serve static files from the Vite build directory
 app.use(express.static(path.join(__dirname, 'dist')));
@@ -61,9 +76,11 @@ app.post('/api/chat', async (req, res) => {
 
     Keep answers concise, educational, and structured. User says: ${message}`;
     
+    console.log(`[Gemini API] Request received for message: "${message.substring(0, 50)}..."`);
     const result = await chat.sendMessage(prompt);
     const response = await result.response;
     const text = response.text();
+    console.log(`[Gemini API] Response generated successfully (${text.length} characters)`);
     
     res.json({ text });
   } catch (error) {

@@ -59,6 +59,8 @@ const Assistant = ({ onClose }) => {
       animate={{ y: 0, opacity: 1 }}
       exit={{ y: 100, opacity: 0 }}
       className="glass assistant-card"
+      role="complementary"
+      aria-label="Election AI Assistant Chat"
       style={{
         width: '400px', height: '600px', display: 'flex', flexDirection: 'column',
         position: 'fixed', bottom: '2rem', right: '2rem', zIndex: 1000,
@@ -71,13 +73,21 @@ const Assistant = ({ onClose }) => {
           <div style={{ width: '10px', height: '10px', borderRadius: '50%', background: 'var(--secondary)' }}></div>
           <span style={{ fontWeight: '600' }}>Election Assistant</span>
         </div>
-        <button onClick={onClose} style={{ background: 'none', color: 'var(--text-muted)' }}>
+        <button 
+          onClick={onClose} 
+          aria-label="Close Assistant"
+          style={{ background: 'none', color: 'var(--text-muted)', cursor: 'pointer' }}
+        >
           <X size={20} />
         </button>
       </div>
 
       {/* Messages */}
-      <div style={{ flex: 1, overflowY: 'auto', padding: '1.5rem', display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+      <div 
+        role="log" 
+        aria-live="polite"
+        style={{ flex: 1, overflowY: 'auto', padding: '1.5rem', display: 'flex', flexDirection: 'column', gap: '1rem' }}
+      >
         {messages.map((msg, i) => (
           <div key={i} style={{ 
             alignSelf: msg.role === 'user' ? 'flex-end' : 'flex-start',
@@ -107,6 +117,7 @@ const Assistant = ({ onClose }) => {
           onChange={(e) => setInput(e.target.value)}
           onKeyPress={(e) => e.key === 'Enter' && handleSend()}
           placeholder="Ask about voter registration..."
+          aria-label="Chat message input"
           style={{ 
             flex: 1, background: 'rgba(255,255,255,0.05)', border: '1px solid var(--glass-border)',
             borderRadius: '8px', padding: '0.75rem 1rem', color: 'var(--text)', outline: 'none'
@@ -114,7 +125,8 @@ const Assistant = ({ onClose }) => {
         />
         <button 
           onClick={handleSend}
-          style={{ background: 'var(--accent)', color: 'var(--primary)', padding: '0.75rem', borderRadius: '8px' }}
+          aria-label="Send message"
+          style={{ background: 'var(--accent)', color: 'var(--primary)', padding: '0.75rem', borderRadius: '8px', cursor: 'pointer' }}
         >
           <Send size={20} />
         </button>
