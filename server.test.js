@@ -21,4 +21,13 @@ describe('API Logic', () => {
     expect(formatted[0].role).toBe('user');
     expect(formatted.length).toBe(1);
   });
+
+  it('should handle empty history gracefully', () => {
+    const history = [];
+    const formatted = history.map(m => ({
+      role: m.role === 'assistant' ? 'model' : 'user',
+      parts: [{ text: m.content }]
+    }));
+    expect(formatted.length).toBe(0);
+  });
 });

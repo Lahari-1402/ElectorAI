@@ -6,6 +6,7 @@ import { fileURLToPath } from 'url';
 import { GoogleGenerativeAI } from '@google/generative-ai';
 import helmet from 'helmet';
 import rateLimit from 'express-rate-limit';
+import compression from 'compression';
 
 
 dotenv.config();
@@ -22,14 +23,19 @@ app.use(helmet({
 }));
 
 const limiter = rateLimit({
-  windowMs: 15 * 60 * 1000, // 15 minutes
-  max: 100, // Limit each IP to 100 requests per window
+  windowMs: 15 * 60 * 1000, 
+  max: 100, 
   message: { error: 'Too many requests from this IP, please try again after 15 minutes' }
 });
 
-app.use(cors());
+app.use(compression()); // Enable Gzip compression for better efficiency
+app.use(cors({
+  origin: '*', // In production, replace with your actual domain
+  methods: ['GET', 'POST'],
+  allowedHeaders: ['Content-Type']
+}));
 app.use(express.json());
-app.use('/api/', limiter); // Apply rate limiting to all API routes
+app.use('/api/', limiter); 
 
 // Serve static files from the Vite build directory
 app.use(express.static(path.join(__dirname, 'dist')));
